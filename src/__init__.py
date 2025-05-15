@@ -19,7 +19,6 @@ app = FastAPI(
     title="Bookly API",
     description="An API for book management",
     version=version,
-    lifespan=lifespan,
 )
 
 app.include_router(book_router, prefix=f"/api/{version}/books", tags=["books"])

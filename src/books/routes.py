@@ -9,15 +9,16 @@ from src.db.main import get_session
 
 from .schemas import Book, BookCreateModel, BookUpdateModel
 
-from src.auth.dependencies import AccessTokenBearer
+from src.auth.dependencies import AccessTokenBearer, RoleChecker
 
 
 book_router = APIRouter()
 book_service = BookService()
 access_token_bearer = AccessTokenBearer()
+role_checker = Depends(RoleChecker(["admin", "user"]))
 
 
-@book_router.get("/", response_model=List[Book])
+@book_router.get("/", response_model=List[Book], dependencies=[role_checker])
 async def get_all_books(
     session: AsyncSession = Depends(get_session),
     user_details=Depends(access_token_bearer),
@@ -27,7 +28,12 @@ async def get_all_books(
     return books
 
 
-@book_router.post("/", status_code=status.HTTP_201_CREATED, response_model=Book)
+@book_router.post(
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    response_model=Book,
+    dependencies=[role_checker],
+)
 async def create_a_books(
     book_data: BookCreateModel,
     session: AsyncSession = Depends(get_session),
@@ -41,6 +47,7 @@ async def create_a_books(
     "/{book_uid}",
     status_code=status.HTTP_202_ACCEPTED,
     response_model=Book,
+    dependencies=[role_checker],
 )
 async def get_a_book(
     book_uid: str,
@@ -59,7 +66,10 @@ async def get_a_book(
 
 
 @book_router.patch(
-    "/{book_uid}", status_code=status.HTTP_202_ACCEPTED, response_model=Book
+    "/{book_uid}",
+    status_code=status.HTTP_202_ACCEPTED,
+    response_model=Book,
+    dependencies=[role_checker],
 )
 async def update_a_book(
     book_uid: str,
@@ -81,8 +91,7 @@ async def update_a_book(
 
 
 @book_router.delete(
-    "/{book_uid}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    "/{book_uid}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[role_checker]
 )
 async def delete_a_book(
     book_uid: str,
