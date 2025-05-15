@@ -53,7 +53,7 @@ async def login(
 
             refresh_token = create_access_token(
                 user_data={"email": user.email, "user_uid": str(user.uid)},
-                expires_delta=timedelta(days=Config.REFRESH_TOKEN_EXPIRE_DAYS),
+                expiry=timedelta(days=Config.REFRESH_TOKEN_EXPIRE_DAYS),
                 refresh=True,
             )
 
