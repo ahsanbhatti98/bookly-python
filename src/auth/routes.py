@@ -8,11 +8,13 @@ from fastapi.responses import JSONResponse
 from .utils import create_access_token, decode_token, verify_password
 from datetime import timedelta, datetime
 from src.config import Config
-from .dependencies import RefreshTokenBearer
+from .dependencies import RefreshTokenBearer, AccessTokenBearer
+from src.db.redis import add_token_to_blocklist
 
 auth_router = APIRouter()
 user_service = UserService()
 refresh_token_bearer = RefreshTokenBearer()
+access_token_bearer = AccessTokenBearer()
 
 
 @auth_router.post(
@@ -91,4 +93,16 @@ async def get_new_access_token(token_details: dict = Depends(refresh_token_beare
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Refresh token has expired",
+    )
+
+
+@auth_router.get("/logout")
+async def revoke_token(token_details: dict = Depends(access_token_bearer)):
+
+    jti = token_details["jti"]
+
+    await add_token_to_blocklist(jti)
+
+    return JSONResponse(
+        content={"message": "Logout successful"}, status_code=status.HTTP_200_OK
     )
