@@ -72,6 +72,8 @@ async def get_a_book(
 ) -> dict:
     book = await book_service.get_book(book_uid, session)
 
+    print("book->>>>", book)
+
     if book:
         return book
     else:

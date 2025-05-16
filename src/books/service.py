@@ -3,6 +3,7 @@ from .schemas import BookCreateModel, BookUpdateModel
 from sqlmodel import select, desc
 from src.db.models import Book
 from datetime import datetime
+from src.errors import BookNotFound
 
 
 class BookService:
@@ -29,15 +30,16 @@ class BookService:
         book_uid: str,
         session: AsyncSession,
     ):
-        statement = select(Book).where(Book.uid == book_uid)
+        try:
+            statement = select(Book).where(Book.uid == book_uid)
 
-        result = await session.exec(statement)
+            result = await session.exec(statement)
 
-        book = result.first()
+            book = result.first()
 
-        print("book-<><<<<", book)
-
-        return book if book is not None else None
+            return book if book is not None else None
+        except:
+            raise BookNotFound()
 
     async def create_book(
         self,
