@@ -7,7 +7,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.books.service import BookService
 from src.db.main import get_session
 
-from .schemas import Book, BookCreateModel, BookUpdateModel
+from .schemas import Book, BookCreateModel, BookUpdateModel, BookDetailsModel
 
 from src.auth.dependencies import AccessTokenBearer, RoleChecker
 
@@ -31,7 +31,7 @@ async def get_all_books(
 @book_router.get(
     "/user/{user_uid}", response_model=List[Book], dependencies=[role_checker]
 )
-async def get_all_books(
+async def get_user_books(
     user_uid: str,
     session: AsyncSession = Depends(get_session),
     token_details: dict = Depends(access_token_bearer),
@@ -60,7 +60,7 @@ async def create_a_books(
 @book_router.get(
     "/{book_uid}",
     status_code=status.HTTP_202_ACCEPTED,
-    response_model=Book,
+    response_model=BookDetailsModel,
     dependencies=[role_checker],
 )
 async def get_a_book(

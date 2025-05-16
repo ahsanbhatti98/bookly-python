@@ -16,7 +16,7 @@ async def add_token_to_blocklist(jti: str) -> None:
 
 
 async def token_in_blocklist(jti: str) -> bool:
-    print("jtidadadadad", jti)
+    # print("jtidadadadad", jti)
     jti = await token_blocklist.get(jti)
 
     return jti is not None
