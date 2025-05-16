@@ -11,6 +11,8 @@ from .schemas import Book, BookCreateModel, BookUpdateModel, BookDetailsModel
 
 from src.auth.dependencies import AccessTokenBearer, RoleChecker
 
+from src.errors import BookNotFound
+
 
 book_router = APIRouter()
 book_service = BookService()
@@ -73,10 +75,7 @@ async def get_a_book(
     if book:
         return book
     else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Book not found",
-        )
+        raise BookNotFound()
 
 
 @book_router.patch(
@@ -98,10 +97,7 @@ async def update_a_book(
     if update_a_book:
         return update_a_book
     else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Book not found",
-        )
+        raise BookNotFound()
 
 
 @book_router.delete(
@@ -117,7 +113,4 @@ async def delete_a_book(
     if book_to_delete:
         return {"message": "Book deleted"}
     else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Book not found",
-        )
+        raise BookNotFound()
